@@ -1,5 +1,6 @@
 package com.videocompress;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
@@ -8,6 +9,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -27,6 +30,13 @@ import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends Activity implements View.OnClickListener {
+
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE};
+
+
+
     private static final String TAG = "MainActivity";
     private Button localButton;
     private Button compressButton;
@@ -39,6 +49,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        // 请求sdcard权限
+        ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, 10010);
+
         initView();
     }
 
@@ -163,7 +178,7 @@ private void openFile(File file) {
             intent.setAction(Intent.ACTION_VIEW);
             if (Build.VERSION.SDK_INT>=24){
                 intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                Uri contentUri=FileProvider.getUriForFile(this,"com.babyinhand.fileprovider",file);
+                Uri contentUri= FileProvider.getUriForFile(this,"com.babyinhand.fileprovider",file);
                 String type = getMIMEType(file);
                 intent.setDataAndType(contentUri,type);
             }else {
@@ -176,7 +191,7 @@ private void openFile(File file) {
             //跳转
             startActivity(intent);
         } catch (Exception e) {
-            Toast.makeText(ActivityLocalVideoActivity.this, "不能打开视频文件", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "不能打开视频文件", Toast.LENGTH_SHORT).show();
         }
 
     }
